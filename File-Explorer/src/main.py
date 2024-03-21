@@ -35,6 +35,7 @@ fileIcon = 0
 items = 0  # holds treeview items
 cwdLabel = 0
 footer = 0
+nflag = 0
 
 def checkPlatform():
     global currDrive, available_drives
@@ -569,10 +570,15 @@ def create_widgets(window):
         label="About the app", command=about_popup, image=info_photo, compound="left"
     )
 
+    natheme = ttk.Menu(bar, tearoff=False, font=("TkDefaultFont", font_size))
+    natheme.add_command(label="Dark", command=lambda: set_nflag("dark"))
+    natheme.add_command(label="White", command=lambda: set_nflag("white"))
+
     bar.add_cascade(label="File", menu=file_menu, underline=0)
     bar.add_cascade(label="Drives", menu=drives_menu, underline=0)
     bar.add_cascade(label="Help", menu=help_menu, underline=0)
     bar.add_cascade(label="About", menu=about_menu, underline=0)
+    bar.add_cascade(label="Theme", menu=natheme, underline=0)
     # --Menu bar
 
     # packs
@@ -617,6 +623,23 @@ def create_widgets(window):
     window.bind("<Control-v>", wrap_paste)
     window.bind("<Control-Shift-N>", wrap_new_dir)
 
+
+def set_nflag(th):
+    global nflag
+    if th == "dark":
+        nflag = 0
+    elif th == "white":
+        nflag = 1
+    update_theme()
+
+def update_theme():
+    global theme
+    if nflag == 0:
+        theme = "morph"
+    else:
+        theme = "vapor"
+    
+    
 
 def sort_col(col, reverse):
     global items
@@ -935,15 +958,15 @@ def del_tag_popup(del_upto):
     if tag_files:
         delta = 0
         if del_upto == "Minitue":
-            delta = timedelta(minutes=1)    
+            delta = timedelta(minutes = 1)    
         elif del_upto == "Hour":
-            delta = timedelta(hours=1)    
+            delta = timedelta(hours = 1)    
         elif del_upto == "Day":
-            delta = timedelta(days=1)    
+            delta = timedelta(days = 1)    
         elif del_upto == "Week":
-            delta = timedelta(days=7)    
+            delta = timedelta(days = 7)    
         elif del_upto == "Month":
-            delta = timedelta(days=30)    
+            delta = timedelta(days = 30)    
         for tag_item in tag_files:
             del_upto_date = datetime.strptime(tag_item['tag_date'],date_format)
             if datetime.now() >= del_upto_date + delta:
@@ -997,12 +1020,13 @@ def main():
     global file_path
     file_path = os.path.join(os.path.dirname(__file__), "../icons/")
     checkPlatform()
-    theme = "superhero"
+    update_theme()
     root = createWindow()
 
     create_widgets(root)
     read_tag()
     refresh([])
+    root.style.theme_use(theme)
     root.mainloop()
 
 
